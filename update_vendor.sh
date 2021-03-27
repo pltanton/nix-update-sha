@@ -23,7 +23,7 @@ git diff-index --quiet HEAD "${pkg}" ||
 	git commit "$packageFile" -m "[CI SKIP] Update vendorSha256 in ${packageFile}: ${vendorSha256} => ${newvendorSha256}"
 echo "done updating ${packageFile} (${vendorSha256} => ${newvendorSha256})"
 if [ "$PUSH" = true ]; then
-	git push origin || echo "Failed to push to origin. Not on the top of the stream?"
+	git push origin $(git branch --show-current $BRANCH_NAME) || echo "Failed to push to origin. Not on the top of the stream?"
 fi
 
 exit 0
