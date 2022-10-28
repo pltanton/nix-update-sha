@@ -1,9 +1,18 @@
 {
   outputs = { self, nixpkgs }:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      systems = [
+        "aarch64-linux"
+        "aarch64-darwin"
+        "i686-linux"
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
       scriptText = builtins.readFile ./update_vendor.sh;
-      script = pkgs.writeScriptBin "update-sha" scriptText;
-    in { defaultPackage.${system} = script; };
+      pkgsFor = system: import nixpkgs { inherit system; };
+      scriptFor = system: (pkgsFor system).writeScriptBin "update-sha" scriptText;
+    in
+    {
+      defaultPackage = builtins.foldl' (attrs: system: attrs // { ${system} = scriptFor system; }) { } systems;
+    };
 }
